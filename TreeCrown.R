@@ -7,11 +7,70 @@ Root <- "" %>% setwd()
 # Import GPKG 
 Trees <- st_read("TreeSample.gpkg")
 
-# CReate centroinds
+# Create centroids
 centroids <- st_centroid(Trees) 
 
+# Create additional fields for the data storage
+centroids$min <- NA
+centroids$med <- NA
+centroids$mean <- NA
+centroids$max <- NA
+
+# Count total of shapes
+TotalTrees <- length(centroids[[1]])
+
+for(i in 1:TotalTrees){
+  # Convert polygon into points
+  PolPoints <- st_cast(Trees[i,],"POINT")
+  
+  # Create rotated line object
+  combined_lines <- st_sfc(geometry = st_sfc()) %>% st_set_crs(st_crs(centroids))
+  
+  # Create a new vector to store lengths
+  Lengthvector <- vector()
+  
+  # Loop over all poligon points to create the lines between centroid and polygon edges
+  for(j in 1:length(PolPoints[[1]])){
+    
+    # Define a set of coordinates to create line from the two points
+    coordinates <- matrix(c(
+      c(st_coordinates(PolPoints[j,])[1], st_coordinates(centroids[i,])[1]),
+      c(st_coordinates(PolPoints[j,])[2], st_coordinates(centroids[i,])[2])
+    ), ncol = 2)
+    
+    # Create an sf LineString object
+    line <- st_linestring(coordinates) %>% st_sfc() %>% st_set_crs(st_crs(centroids))
+    
+    # Calculate length of line
+    Length <- st_length(line)
+    
+    # Combine the rotated LINESTRING objects into a single sfc object
+    combined_lines <- st_combine(c(combined_lines, line))
+    
+    # Add up the lengths in the vector
+    Lengthvector <- c(Lengthvector,c(Length))
+    
+  }
+  
+  # Calculate fields from the lines and store them on the respective centroid 
+  centroids$min[i] <- round(min(Lengthvector),2)
+  centroids$med[i] <- round(median(Lengthvector),2)
+  centroids$mean[i] <- round(mean(Lengthvector),2)
+  centroids$max[i] <- round(max(Lengthvector),2)
+  
+  
+}
+
+#Visual inspection
+mapview(Trees) +
+  mapview(centroids, col.regions = "green") 
+
+
+###############################################################################
+###############################################################################
+
 # Select tree Id (to do loop afterwards
-TreeID <- 2
+TreeID <- 4
 
 # Convert polygon into points
 PolPoints <- st_cast(Trees[TreeID,],"POINT")
