@@ -19,6 +19,10 @@ centroids$max <- NA
 # Count total of shapes
 TotalTrees <- length(centroids[[1]])
 
+# CReate progress bar
+pb <- txtProgressBar(min = 1, max = TotalTrees, style = 3)
+
+# Loop over all available tree shapes
 for(i in 1:TotalTrees){
   # Convert polygon into points
   PolPoints <- st_cast(Trees[i,],"POINT")
@@ -58,6 +62,13 @@ for(i in 1:TotalTrees){
   centroids$mean[i] <- round(mean(Lengthvector),2)
   centroids$max[i] <- round(max(Lengthvector),2)
   
+  # Increment progress bar
+  setTxtProgressBar(pb, i)
+  
+  # Close progress bar when done
+  if(i == TotalTrees){
+    close(pb)
+  }
   
 }
 
