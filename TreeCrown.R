@@ -2,7 +2,7 @@
 pacman::p_load(dplyr,sf,ggplot2, mapview, st, units, REdaS)
 
 # Set WD
-Root <- "" %>% setwd()
+Root <- "/home/cowboybebop/Documents/PhD/Codes/TreeDiam/" %>% setwd()
 
 # Import GPKG 
 Trees <- st_read("TreeSample.gpkg")
