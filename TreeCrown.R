@@ -5,7 +5,7 @@ pacman::p_load(dplyr,sf,ggplot2, mapview, st, units, REdaS)
 Root <- "" %>% setwd()
 
 # Import GPKG 
-Trees <- st_read("TreeSample.gpkg")
+Trees <- st_read("test_trees_diam.gpkg")
 
 # Create centroids
 centroids <- st_centroid(Trees) 
@@ -188,6 +188,8 @@ ggplot(LengthDF, aes(x=Length)) +
   scale_x_continuous(expand = c(0,0)) +
   scale_y_continuous(expand = c(0,0)) +
   labs(color = "Stats")
+
+Length_Tree<-mean(LengthDF$Length)
 
 
 # 
